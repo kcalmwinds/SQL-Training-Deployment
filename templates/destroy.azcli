@@ -1,0 +1,2 @@
+
+az group delete -g SqlTrainRGT -y

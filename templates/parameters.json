@@ -1,0 +1,54 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualMachines_SQLDCVM_name": {
+            "value": "SQLDCVM"
+        },
+        "bastionHosts_SQLbastion_name": {
+            "value": "SQLbastion"
+        },
+        "virtualNetworks_SQLVnet_name": {
+            "value": "SQLVnet"
+        },
+        "virtualMachines_SQL1VM_name": {
+            "value": "SQL1VM"
+        },
+        "virtualMachines_SQL3VM_name": {
+            "value": "SQL3VM"
+        },
+        "virtualMachines_SQL2VM_name": {
+            "value": "SQL2VM"
+        },
+        "networkInterfaces_SQLdcvmNIC_name": {
+            "value": "SQLdcvmNIC"
+        },
+        "networkInterfaces_SQL1vmNIC_name": {
+            "value": "SQL1vmNIC"
+        },
+        "networkInterfaces_SQL3vmNIC_name": {
+            "value": "SQL3vmNIC"
+        },
+        "PublicIPAddresses_BastEndpoint_name": {
+            "value": "BastEndpoint"
+        },
+        "networkInterfaces_SQL2vmNIC_name": {
+            "value": "SQL2vmNIC"
+        },
+        "sqlVirtualMachines_SQL1VM_name": {
+            "value": "SQL1VM"
+        },
+        "sqlVirtualMachines_SQL3VM_name": {
+            "value": "SQL3VM"
+        },
+        "sqlVirtualMachines_SQL2VM_name": {
+            "value": "SQL2VM"
+        },
+        "osAndSQLLogin": {
+            "value": "adminuser"
+        },
+        "osandSQLPw": {
+            "value": "Password123!"
+        }
+    }
+}
