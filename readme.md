@@ -265,7 +265,7 @@ It does not need to be monitored. Destroying the resource group will destroy all
 
 Now that you have walked through it, lets cut out some of the work:
 
-![Deploy to Azure](https://aka.ms/deploytoazurebutton)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fkcalmwinds%2FSQL-Training-Deployment%2Fmain%2Ftemplates%2Ftemplate.json)
 
 ### **Contributors**
 
