@@ -10,6 +10,8 @@
 
 ---
 
+An HTML Version of these instructions are located in [.\readme](.\readme\readme.html) of this package if you are working locally.
+
 This package is to be used for deploying 4 servers.
 
 | Purpose                           | Name    | IP       | IP Type |

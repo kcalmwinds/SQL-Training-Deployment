@@ -1,0 +1,146 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+    <title>**How To Use This Package**</title>
+    <link type="text/css" rel="stylesheet" href="assets/css/github-markdown.css">
+    <link type="text/css" rel="stylesheet" href="assets/css/pilcrow.css">
+    <link type="text/css" rel="stylesheet" href="assets/css/hljs-github.min.css"/>
+  </head>
+  <body>
+    <article class="markdown-body"><h2 id="how-to-use-this-package"><a class="header-link" href="#how-to-use-this-package"></a><strong>How To Use This Package</strong></h2>
+<hr>
+<h3 id="whats-inside"><a class="header-link" href="#whats-inside"></a><strong>What&#39;s Inside?</strong></h3>
+<hr>
+<p>An HTML Version of these instructions are located in <a href=".\readme\readme.html">.\readme</a> of this package if you are working locally.</p>
+<p>This package is to be used for deploying 4 servers.</p>
+<table>
+<thead>
+<tr>
+<th>Purpose</th>
+<th>Name</th>
+<th>IP</th>
+<th>IP Type</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A DNS Server</td>
+<td>SQLDCVM</td>
+<td>10.2.0.4</td>
+<td>Static</td>
+</tr>
+<tr>
+<td>SQL Server 2019 Developer Edition</td>
+<td>SQLVM1</td>
+<td>10.2.0.5</td>
+<td>Static</td>
+</tr>
+<tr>
+<td>SQL Server 2019 Developer Edition</td>
+<td>SQLVM2</td>
+<td>10.2.0.6</td>
+<td>Static</td>
+</tr>
+<tr>
+<td>SQL Server 2019 Developer Edition</td>
+<td>SQLVM3</td>
+<td>10.2.0.7</td>
+<td>Static</td>
+</tr>
+</tbody></table>
+<ul class="list">
+<li><p>Bastion for VM access due to corp policy</p>
+</li>
+<li><p>VNET</p>
+<ul class="list">
+<li>default subnet</li>
+<li>subnet for Bastion</li>
+<li>preconfigured DNS entry for 10.2.0.4</li>
+<li>3 SQLVM Resource Providers</li>
+<li>1 Availability Set for all 3 SQL Servers</li>
+</ul>
+</li>
+<li><p>Powershell script to install AzureCLI on your local machine</p>
+</li>
+<li><p>Script to create the DC and AD for SQLTRAIN.com</p>
+</li>
+<li><p>Script to join the SQLTRAIN domain</p>
+</li>
+<li><p>a basic configuration script for SQL configuration</p>
+<ul class="list">
+<li>Firewall Rules for ports<ul class="list">
+<li>1433</li>
+<li>5022</li>
+<li>59999 - healthprobe</li>
+</ul>
+</li>
+<li>Install latest SQLSERVER cmdlets</li>
+<li>Install AzureCLI</li>
+<li>Install Google Chrome to bypass IE Security to get other tools</li>
+<li>Creates login for SQLVM1, 2, and 3 and makes them SA on all SQL Server Instances</li>
+<li>Enables TCP for SQL Server (Developer default is disabled)</li>
+<li>Creates a directory C:\Adventureworks and Downloads Adventureworks2017.bak</li>
+<li>Creates a folder C:\snapshot <em>for replications practice</em></li>
+</ul>
+</li>
+</ul>
+<hr>
+<hr>
+<h3 id="what-you-need-to-know"><a class="header-link" href="#what-you-need-to-know"></a><strong>What You Need To Know</strong></h3>
+<hr>
+<p>This deployment does not attach any disks or preconfigure stripting. Each VM deploys with the OS disk sized at 1tb. Though data disks are not attached, there is nothing stopping an engineer from practicing how to work with Storage Spaces and Deploying Azure Managed Disks to do striping exercises.</p>
+<p>SQL VM agent is installed but it is only configured enough to access SQL Server to configure connectivity private within vnet, port 1433 open, and configure SQL Login to adminuser/Password123!.</p>
+<blockquote>
+<p>With the above written, this is not meant to host or contain actual user data. If you do use this environment for production or reproduction purposes, <strong>CHANGE THE USERNAME AND PASSWORD IN THE PARAMETER FILE</strong></p>
+</blockquote>
+<pre class="hljs"><code>{
+  <span class="hljs-attr">&quot;osAndSQLLogin&quot;</span>: {
+    <span class="hljs-attr">&quot;value&quot;</span>: <span class="hljs-string">&quot;adminuser&quot;</span>
+  },
+  <span class="hljs-attr">&quot;osandSQLPw&quot;</span>: {
+    <span class="hljs-attr">&quot;value&quot;</span>: <span class="hljs-string">&quot;Password123!&quot;</span>
+  }
+}</code></pre><p>Bastion connectivity was implemented due to policy pushed to deployments in some organizations creating very restrictive Network Security Group rules that make it very difficult to use RDP. Bastion bypasses all of that and hosts the RDP session directly in the browser through the Azure portal.</p>
+<p>With Bastion, you can only copy and paste text to and from your local machine to the remote machine and back. It shares a clipboard. There will be some steps where you will do exactly this and when using hte DNS configuration file, you will need to copy the contents of the XML file locally into a new xml file on the remote machine.</p>
+<hr>
+<h3 id="steps"><a class="header-link" href="#steps"></a><strong>Steps</strong></h3>
+<hr>
+<p>All steps will take place in the folder you cloned this repository to.</p>
+<hr>
+<hr>
+<h4 id="1-install-azure-cli"><a class="header-link" href="#1-install-azure-cli"></a><strong>1 Install Azure CLI</strong></h4>
+<hr>
+<p>Open up a powershell process in administrator mode and run the following.</p>
+<pre class="hljs"><code><span class="hljs-built_in">Invoke-WebRequest</span> <span class="hljs-literal">-Uri</span> https://aka.ms/installazurecliwindows <span class="hljs-literal">-OutFile</span> .\AzureCLI.msi; <span class="hljs-built_in">Start-Process</span> msiexec.exe <span class="hljs-literal">-Wait</span> <span class="hljs-literal">-ArgumentList</span> <span class="hljs-string">&#x27;/I AzureCLI.msi /quiet&#x27;</span>; <span class="hljs-built_in">rm</span> .\AzureCLI.msi</code></pre><h4 id="2-templates-deploy-4-servers-using-deployazcli"><a class="header-link" href="#2-templates-deploy-4-servers-using-deployazcli"></a><strong>2 templates\ deploy 4 servers using deploy.azcli</strong></h4>
+<hr>
+<p>From the root of the clone directory using Administrative PowerShell window:</p>
+<pre class="hljs"><code>az <span class="hljs-keyword">group</span> <span class="hljs-keyword">create</span> -g SqlTrainRG -l centralus
+az deployment <span class="hljs-keyword">group</span> <span class="hljs-keyword">create</span> -g sqlTrainRG -f .\templates\<span class="hljs-keyword">template</span>.json -p .\templates\parameters.json</code></pre><p>The entire process takes about 20 minutes if you monitor the resource group deployment from the portal. Most of that time is Bastion deploying and configuring itself.</p>
+<hr>
+<h4 id="3-create-dcad-using-create_dns_ad"><a class="header-link" href="#3-create-dcad-using-create_dns_ad"></a>*<em>3 Create DC/AD using create_dns_ad\*</em></h4>
+<hr>
+<p>stuff</p>
+<hr>
+<h4 id="4-add-sql-nodes-to-ad-using-add_to_domain"><a class="header-link" href="#4-add-sql-nodes-to-ad-using-add_to_domain"></a>*<em>4 Add SQL Nodes to AD using add_to_domain\*</em></h4>
+<hr>
+<p>stuff</p>
+<hr>
+<h4 id="5-configuring-sql-on-all-nodes-using-sqlconfigure"><a class="header-link" href="#5-configuring-sql-on-all-nodes-using-sqlconfigure"></a>*<em>5 Configuring SQL On All Nodes Using sqlconfigure\*</em></h4>
+<hr>
+<p>stuff</p>
+<hr>
+<h2 id="im-done-now-what"><a class="header-link" href="#im-done-now-what"></a>I&#39;m Done! Now What?</h2>
+<p>This is the easy part. Simply destroy the entire resource group.</p>
+<pre class="hljs"><code>az <span class="hljs-keyword">group</span> <span class="hljs-title">delete</span> -g SqlTrainRG -y</code></pre><p>It does not need to be monitored. Destroying the resource group will destroy all deployed resources. This follows the model of:</p>
+<ul class="list">
+<li>Deploy It</li>
+<li>Configure It</li>
+<li>Reproduce It</li>
+<li>Destroy it</li>
+</ul>
+<h3 id="contributors"><a class="header-link" href="#contributors"></a><strong>Contributors</strong></h3>
+<p>Mark Cameron - MARKCAME - <a href="mailto:&#77;&#x41;&#x52;&#x4b;&#67;&#x41;&#77;&#69;&#64;&#x6d;&#x69;&#x63;&#x72;&#111;&#x73;&#111;&#102;&#116;&#46;&#99;&#x6f;&#x6d;">&#77;&#x41;&#x52;&#x4b;&#67;&#x41;&#77;&#69;&#64;&#x6d;&#x69;&#x63;&#x72;&#111;&#x73;&#111;&#102;&#116;&#46;&#99;&#x6f;&#x6d;</a></p>
+    </article>
+  </body>
+</html>
