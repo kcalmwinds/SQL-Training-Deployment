@@ -1,16 +1,25 @@
-#use this to install azure cli to support the rest of the template process
+#use this to install azure cli to support the rest of the template process. 
+# If you modified the ARM template in any way, please adjust the appropriate commands below
+
+
 #get adventureworks2017 
 mkdir c:\adventureworks
 Invoke-WebRequest -Uri https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2017.bak -OutFile c:\adventureworks\AdventureWorks2017.bak
-#use this to install azure cli to support the rest of the template process
+
+
+#use this to install azure cli 
 Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
+
+
 # Firewall Rules
 New-NetFirewallRule -DisplayName "SQLEndpoint" -Direction Inbound -protocol TCP -LocalPort 1433  -Action Allow -Enabled True
 New-NetFirewallRule -DisplayName "SQLHADREndpoint" -Direction Inbound  -protocol TCP -LocalPort 5022  -Action Allow -Enabled True
 New-NetFirewallRule -DisplayName "Healthprobe" -Direction Inbound -protocol TCP -LocalPort 59999 -Action Allow -Enabled True
 
+
 # latest sqlserver cmdlets
 install-module sqlserver -AllowClobber -Force
+
 
 #after domain join, needs to be done under local adminuser acct -  run powershell as adminuser to do this or login as adminuser.
 Invoke-Sqlcmd -Database "master" -Query "CREATE LOGIN [SQLTRAIN\adminuser] FROM WINDOWS WITH DEFAULT_DATABASE=[master]" -ServerInstance "." 
@@ -22,16 +31,13 @@ Invoke-Sqlcmd -Database "master" -Query "ALTER SERVER ROLE [sysadmin] ADD MEMBER
 Invoke-Sqlcmd -Database "master" -Query "ALTER SERVER ROLE [sysadmin] ADD MEMBER [SQLTRAIN\SQL1vm$]" -ServerInstance "."
 Invoke-Sqlcmd -Database "master" -Query "ALTER SERVER ROLE [sysadmin] ADD MEMBER [SQLTRAIN\SQL3vm$]" -ServerInstance "."
 
-#make directory for snapshots
+
+#make directory for snapshots -- replication stuff
 mkdir c:\snapshot
 
 
-
 #grab chrome to bypass IE security
-
 $LocalTempDir = $env:TEMP; $ChromeInstaller = "ChromeInstaller.exe"; (new-object    System.Net.WebClient).DownloadFile('http://dl.google.com/chrome/install/375.126/chrome_installer.exe', "$LocalTempDir\$ChromeInstaller"); & "$LocalTempDir\$ChromeInstaller" /silent /install; $Process2Monitor = "ChromeInstaller"; Do { $ProcessesFound = Get-Process | ? { $Process2Monitor -contains $_.Name } | Select-Object -ExpandProperty Name; If ($ProcessesFound) { "Still running: $($ProcessesFound -join ', ')" | Write-Host; Start-Sleep -Seconds 2 } else { rm "$LocalTempDir\$ChromeInstaller" -ErrorAction SilentlyContinue -Verbose } } Until (!$ProcessesFound)
-
-
 
 
 # Get access to SqlWmiManagement DLL on the machine with SQL

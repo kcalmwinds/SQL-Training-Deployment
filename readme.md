@@ -10,7 +10,7 @@
 
 ---
 
-An HTML Version of these instructions are located in [.\readme](.\readme\readme.html) of this package if you are working locally.
+An HTML Version of these instructions are located in .\readme of this package if you are working locally.
 
 This package is to be used for deploying 4 servers.
 
@@ -21,7 +21,7 @@ This package is to be used for deploying 4 servers.
 | SQL Server 2019 Developer Edition | SQLVM2  | 10.2.0.6 | Static  |
 | SQL Server 2019 Developer Edition | SQLVM3  | 10.2.0.7 | Static  |
 
-- Bastion for VM access due to corp policy
+- Bastion for VM access
 - VNET
 
   - default subnet
@@ -97,6 +97,8 @@ Open up a powershell process in administrator mode and run the following.
 Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
 ```
 
+---
+
 #### **2 templates\ deploy 4 servers using deploy.azcli**
 
 ---
@@ -110,33 +112,144 @@ az deployment group create -g sqlTrainRG -f .\templates\template.json -p .\templ
 
 The entire process takes about 20 minutes if you monitor the resource group deployment from the portal. Most of that time is Bastion deploying and configuring itself.
 
----
-
-#### **3 Create DC/AD using create_dns_ad\\**
+Once the deployment is complete, open a Bastion session to **SQLDCVM, SQL1VM, SQL2VM, and SQL3VM**
 
 ---
 
-stuff
+#### **3 create_dns_ad\\ : Create DC/AD**
 
 ---
 
-#### **4 Add SQL Nodes to AD using add_to_domain\\**
+In your Bastion session to **SQLDCVM**, create a text file then copy and paste the contents of ./create_dns_ad/DNSConfigTemplate.xml into the new text file and save it. Change the .txt extension to .xml. You may have use the view ribbon in File Explorer to enable showing extensions to properly change it.
+
+Open an administrative PowerShell console on **SQLDCVM** and run:
+
+```powershell
+#to be run on the to-be domain controller
+Install-WindowsFeature -ConfigurationFilePath DNSConfigTemplate.xml
+#
+# Windows PowerShell script for AD DS Deployment
+#
+$securepass = ConvertTo-SecureString "Password123!" -AsPlainText -Force
+Import-Module ADDSDeployment
+Install-ADDSForest `
+    -SafeModeAdministratorPassword $securepass `
+    -CreateDnsDelegation:$false `
+    -DatabasePath "C:\windows\NTDS" `
+    -DomainMode "WinThreshold" `
+    -DomainName "sqltrain.com" `
+    -DomainNetbiosName "SQLTRAIN" `
+    -ForestMode "WinThreshold" `
+    -InstallDns:$true `
+    -LogPath "C:\windows\NTDS" `
+    -NoRebootOnCompletion:$false `
+    -SysvolPath "C:\windows\SYSVOL" `
+    -Force:$true
+```
+
+This will configure the DNS and setup the AD forest SQLTRAIN.
+
+You will see a connection lost message from bastion but let it continue to reconnect. Once Bastion is connected to **SQLDCVM** again, you can begin domain joining the SQL VMs.
 
 ---
 
-stuff
+#### **4 add_to_domain\\ : Add SQL Nodes to AD**
 
 ---
 
-#### **5 Configuring SQL On All Nodes Using sqlconfigure\\**
+In your Bastions sessions to the SQLVM servers, open up an administrative PowerShell console and run the following:
+
+```powershell
+Add-Computer -DomainName sqltrain.com -Credential sqltrain\adminuser -Restart
+```
+
+It will prompt you for the password. Enter it and the VM will restart. Do not close your Bastion session. The next section can only be done as the local admin of the server. Once the Bastion session is reconnected, proceed to step 5
 
 ---
 
-stuff
+#### **5 sqlconfigure\\ Configuring SQL On All Nodes**
 
 ---
 
-## I'm Done! Now What?
+This is where the majority of the configuration happens. You will find all the things this powershell does at the top of the document.
+
+```powershell
+#use this to install azure cli to support the rest of the template process.
+# If you modified the ARM template in any way, please adjust the appropriate commands below
+
+
+#get adventureworks2017
+mkdir c:\adventureworks
+Invoke-WebRequest -Uri https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2017.bak -OutFile c:\adventureworks\AdventureWorks2017.bak
+
+
+#use this to install azure cli
+Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
+
+
+# Firewall Rules
+New-NetFirewallRule -DisplayName "SQLEndpoint" -Direction Inbound -protocol TCP -LocalPort 1433  -Action Allow -Enabled True
+New-NetFirewallRule -DisplayName "SQLHADREndpoint" -Direction Inbound  -protocol TCP -LocalPort 5022  -Action Allow -Enabled True
+New-NetFirewallRule -DisplayName "Healthprobe" -Direction Inbound -protocol TCP -LocalPort 59999 -Action Allow -Enabled True
+
+
+# latest sqlserver cmdlets
+install-module sqlserver -AllowClobber -Force
+
+
+#after domain join, needs to be done under local adminuser acct -  run powershell as adminuser to do this or login as adminuser.
+Invoke-Sqlcmd -Database "master" -Query "CREATE LOGIN [SQLTRAIN\adminuser] FROM WINDOWS WITH DEFAULT_DATABASE=[master]" -ServerInstance "."
+Invoke-Sqlcmd -Database "master" -Query "ALTER SERVER ROLE [sysadmin] ADD MEMBER [SQLTRAIN\adminuser]" -ServerInstance "."
+Invoke-Sqlcmd -Database "master" -Query "CREATE LOGIN [SQLTRAIN\SQL2VM$] FROM WINDOWS WITH DEFAULT_DATABASE=[master]" -ServerInstance "."
+Invoke-Sqlcmd -Database "master" -Query "CREATE LOGIN [SQLTRAIN\SQL1vm$] FROM WINDOWS WITH DEFAULT_DATABASE=[master]" -ServerInstance "."
+Invoke-Sqlcmd -Database "master" -Query "CREATE LOGIN [SQLTRAIN\SQL3vm$] FROM WINDOWS WITH DEFAULT_DATABASE=[master]" -ServerInstance "."
+Invoke-Sqlcmd -Database "master" -Query "ALTER SERVER ROLE [sysadmin] ADD MEMBER [SQLTRAIN\SQL2VM$]" -ServerInstance "."
+Invoke-Sqlcmd -Database "master" -Query "ALTER SERVER ROLE [sysadmin] ADD MEMBER [SQLTRAIN\SQL1vm$]" -ServerInstance "."
+Invoke-Sqlcmd -Database "master" -Query "ALTER SERVER ROLE [sysadmin] ADD MEMBER [SQLTRAIN\SQL3vm$]" -ServerInstance "."
+
+
+#make directory for snapshots -- replication stuff
+mkdir c:\snapshot
+
+
+#grab chrome to bypass IE security
+$LocalTempDir = $env:TEMP; $ChromeInstaller = "ChromeInstaller.exe"; (new-object    System.Net.WebClient).DownloadFile('http://dl.google.com/chrome/install/375.126/chrome_installer.exe', "$LocalTempDir\$ChromeInstaller"); & "$LocalTempDir\$ChromeInstaller" /silent /install; $Process2Monitor = "ChromeInstaller"; Do { $ProcessesFound = Get-Process | ? { $Process2Monitor -contains $_.Name } | Select-Object -ExpandProperty Name; If ($ProcessesFound) { "Still running: $($ProcessesFound -join ', ')" | Write-Host; Start-Sleep -Seconds 2 } else { rm "$LocalTempDir\$ChromeInstaller" -ErrorAction SilentlyContinue -Verbose } } Until (!$ProcessesFound)
+
+
+# Get access to SqlWmiManagement DLL on the machine with SQL
+# we are on, which is where SQL Server was installed.
+# Note: this is installed in the GAC by SQL Server Setup.
+
+[System.Reflection.Assembly]::LoadWithPartialName('Microsoft.SqlServer.SqlWmiManagement')
+
+# Instantiate a ManagedComputer object which exposes primitives to control the
+# installation of SQL Server on this machine.
+
+$wmi = New-Object 'Microsoft.SqlServer.Management.Smo.Wmi.ManagedComputer' localhost
+
+# Enable the TCP protocol on the default instance. If the instance is named,
+# replace MSSQLSERVER with the instance name in the following line.
+
+$tcp = $wmi.ServerInstances['MSSQLSERVER'].ServerProtocols['Tcp']
+$tcp.IsEnabled = $true
+$tcp.Alter()
+
+# You need to restart SQL Server for the change to persist
+# -Force takes care of any dependent services, like SQL Agent.
+# Note: if the instance is named, replace MSSQLSERVER with MSSQL$ followed by
+# the name of the instance (e.g. MSSQL$MYINSTANCE)
+
+Restart-Service -Name MSSQLSERVER -Force
+```
+
+That's it! Everything else is going to come down what it is you are training with. Classic mirroring, Log Shipping, Availability Groups, Failover Cluster Instances, replication...
+this will meet the needs of just about anything you could want. If you get fancy, you can deploy it twice and work with Distributed Availability Groups.
+
+This template was designed with speed of infrastructure deployment in mind. I have provided some basic scripts to accelerate domain configuration. Everything else is up to you!
+
+---
+
+## **I'm Done! Now What?**
 
 This is the easy part. Simply destroy the entire resource group.
 
@@ -151,6 +264,23 @@ It does not need to be monitored. Destroying the resource group will destroy all
 - Reproduce It
 - Destroy it
 
+Now that you have walked through it, lets cut out some of the work:
+
+![Deploy to Azure](https://aka.ms/deploytoazurebutton)
+
 ### **Contributors**
 
+---
+
 Mark Cameron - MARKCAME - MARKCAME@microsoft.com
+
+---
+
+#### **Tools used**
+
+---
+
+| Tool         | Who has it            | How to get it                              |
+| ------------ | --------------------- | ------------------------------------------ |
+| VSCode       | Microsoft             | [DOWNLOAD](https://code.visualstudio.com/) |
+| genterate-md | NPM : markdown-styles | `npm install -g markdown-styles`           |
