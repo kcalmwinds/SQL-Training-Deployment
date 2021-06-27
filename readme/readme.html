@@ -148,11 +148,80 @@ az deployment <span class="hljs-keyword">group</span> <span class="hljs-keyword"
 <hr>
 <h4 id="4-add_to_domain--add-sql-nodes-to-ad"><a class="header-link" href="#4-add_to_domain--add-sql-nodes-to-ad"></a><strong>4 add_to_domain\ : Add SQL Nodes to AD</strong></h4>
 <hr>
-<p>stuff</p>
+<p>In your Bastions sessions to the SQLVM servers, open up an administrative PowerShell console and run the following:</p>
+<pre class="hljs"><code><span class="hljs-built_in">Add-Computer</span> <span class="hljs-literal">-DomainName</span> sqltrain.com <span class="hljs-literal">-Credential</span> sqltrain\adminuser <span class="hljs-literal">-Restart</span></code></pre><p>It will prompt you for the password. Enter it and the VM will restart. Do not close your Bastion session. The next section can only be done as the local admin of the server. Once the Bastion session is reconnected, proceed to step 5</p>
 <hr>
 <h4 id="5-sqlconfigure-configuring-sql-on-all-nodes"><a class="header-link" href="#5-sqlconfigure-configuring-sql-on-all-nodes"></a><strong>5 sqlconfigure\ Configuring SQL On All Nodes</strong></h4>
 <hr>
-<p>stuff</p>
+<p>This is where the majority of the configuration happens. You will find all the things this powershell does at the top of the document.</p>
+<pre class="hljs"><code><span class="hljs-comment">#use this to install azure cli to support the rest of the template process.</span>
+<span class="hljs-comment"># If you modified the ARM template in any way, please adjust the appropriate commands below</span>
+
+
+<span class="hljs-comment">#get adventureworks2017</span>
+mkdir c:\adventureworks
+<span class="hljs-built_in">Invoke-WebRequest</span> <span class="hljs-literal">-Uri</span> https://github.com/Microsoft/sql<span class="hljs-literal">-server</span><span class="hljs-literal">-samples</span>/releases/download/adventureworks/AdventureWorks2017.bak <span class="hljs-literal">-OutFile</span> c:\adventureworks\AdventureWorks2017.bak
+
+
+<span class="hljs-comment">#use this to install azure cli</span>
+<span class="hljs-built_in">Invoke-WebRequest</span> <span class="hljs-literal">-Uri</span> https://aka.ms/installazurecliwindows <span class="hljs-literal">-OutFile</span> .\AzureCLI.msi; <span class="hljs-built_in">Start-Process</span> msiexec.exe <span class="hljs-literal">-Wait</span> <span class="hljs-literal">-ArgumentList</span> <span class="hljs-string">&#x27;/I AzureCLI.msi /quiet&#x27;</span>; <span class="hljs-built_in">rm</span> .\AzureCLI.msi
+
+
+<span class="hljs-comment"># Firewall Rules</span>
+<span class="hljs-built_in">New-NetFirewallRule</span> <span class="hljs-literal">-DisplayName</span> <span class="hljs-string">&quot;SQLEndpoint&quot;</span> <span class="hljs-literal">-Direction</span> Inbound <span class="hljs-literal">-protocol</span> TCP <span class="hljs-literal">-LocalPort</span> <span class="hljs-number">1433</span>  <span class="hljs-literal">-Action</span> Allow <span class="hljs-literal">-Enabled</span> True
+<span class="hljs-built_in">New-NetFirewallRule</span> <span class="hljs-literal">-DisplayName</span> <span class="hljs-string">&quot;SQLHADREndpoint&quot;</span> <span class="hljs-literal">-Direction</span> Inbound  <span class="hljs-literal">-protocol</span> TCP <span class="hljs-literal">-LocalPort</span> <span class="hljs-number">5022</span>  <span class="hljs-literal">-Action</span> Allow <span class="hljs-literal">-Enabled</span> True
+<span class="hljs-built_in">New-NetFirewallRule</span> <span class="hljs-literal">-DisplayName</span> <span class="hljs-string">&quot;Healthprobe&quot;</span> <span class="hljs-literal">-Direction</span> Inbound <span class="hljs-literal">-protocol</span> TCP <span class="hljs-literal">-LocalPort</span> <span class="hljs-number">59999</span> <span class="hljs-literal">-Action</span> Allow <span class="hljs-literal">-Enabled</span> True
+
+
+<span class="hljs-comment"># latest sqlserver cmdlets</span>
+<span class="hljs-built_in">install-module</span> sqlserver <span class="hljs-literal">-AllowClobber</span> <span class="hljs-literal">-Force</span>
+
+
+<span class="hljs-comment">#after domain join, needs to be done under local adminuser acct -  run powershell as adminuser to do this or login as adminuser.</span>
+<span class="hljs-built_in">Invoke-Sqlcmd</span> <span class="hljs-literal">-Database</span> <span class="hljs-string">&quot;master&quot;</span> <span class="hljs-literal">-Query</span> <span class="hljs-string">&quot;CREATE LOGIN [SQLTRAIN\adminuser] FROM WINDOWS WITH DEFAULT_DATABASE=[master]&quot;</span> <span class="hljs-literal">-ServerInstance</span> <span class="hljs-string">&quot;.&quot;</span>
+<span class="hljs-built_in">Invoke-Sqlcmd</span> <span class="hljs-literal">-Database</span> <span class="hljs-string">&quot;master&quot;</span> <span class="hljs-literal">-Query</span> <span class="hljs-string">&quot;ALTER SERVER ROLE [sysadmin] ADD MEMBER [SQLTRAIN\adminuser]&quot;</span> <span class="hljs-literal">-ServerInstance</span> <span class="hljs-string">&quot;.&quot;</span>
+<span class="hljs-built_in">Invoke-Sqlcmd</span> <span class="hljs-literal">-Database</span> <span class="hljs-string">&quot;master&quot;</span> <span class="hljs-literal">-Query</span> <span class="hljs-string">&quot;CREATE LOGIN [SQLTRAIN\SQL2VM<span class="hljs-variable">$</span>] FROM WINDOWS WITH DEFAULT_DATABASE=[master]&quot;</span> <span class="hljs-literal">-ServerInstance</span> <span class="hljs-string">&quot;.&quot;</span>
+<span class="hljs-built_in">Invoke-Sqlcmd</span> <span class="hljs-literal">-Database</span> <span class="hljs-string">&quot;master&quot;</span> <span class="hljs-literal">-Query</span> <span class="hljs-string">&quot;CREATE LOGIN [SQLTRAIN\SQL1vm<span class="hljs-variable">$</span>] FROM WINDOWS WITH DEFAULT_DATABASE=[master]&quot;</span> <span class="hljs-literal">-ServerInstance</span> <span class="hljs-string">&quot;.&quot;</span>
+<span class="hljs-built_in">Invoke-Sqlcmd</span> <span class="hljs-literal">-Database</span> <span class="hljs-string">&quot;master&quot;</span> <span class="hljs-literal">-Query</span> <span class="hljs-string">&quot;CREATE LOGIN [SQLTRAIN\SQL3vm<span class="hljs-variable">$</span>] FROM WINDOWS WITH DEFAULT_DATABASE=[master]&quot;</span> <span class="hljs-literal">-ServerInstance</span> <span class="hljs-string">&quot;.&quot;</span>
+<span class="hljs-built_in">Invoke-Sqlcmd</span> <span class="hljs-literal">-Database</span> <span class="hljs-string">&quot;master&quot;</span> <span class="hljs-literal">-Query</span> <span class="hljs-string">&quot;ALTER SERVER ROLE [sysadmin] ADD MEMBER [SQLTRAIN\SQL2VM<span class="hljs-variable">$</span>]&quot;</span> <span class="hljs-literal">-ServerInstance</span> <span class="hljs-string">&quot;.&quot;</span>
+<span class="hljs-built_in">Invoke-Sqlcmd</span> <span class="hljs-literal">-Database</span> <span class="hljs-string">&quot;master&quot;</span> <span class="hljs-literal">-Query</span> <span class="hljs-string">&quot;ALTER SERVER ROLE [sysadmin] ADD MEMBER [SQLTRAIN\SQL1vm<span class="hljs-variable">$</span>]&quot;</span> <span class="hljs-literal">-ServerInstance</span> <span class="hljs-string">&quot;.&quot;</span>
+<span class="hljs-built_in">Invoke-Sqlcmd</span> <span class="hljs-literal">-Database</span> <span class="hljs-string">&quot;master&quot;</span> <span class="hljs-literal">-Query</span> <span class="hljs-string">&quot;ALTER SERVER ROLE [sysadmin] ADD MEMBER [SQLTRAIN\SQL3vm<span class="hljs-variable">$</span>]&quot;</span> <span class="hljs-literal">-ServerInstance</span> <span class="hljs-string">&quot;.&quot;</span>
+
+
+<span class="hljs-comment">#make directory for snapshots -- replication stuff</span>
+mkdir c:\snapshot
+
+
+<span class="hljs-comment">#grab chrome to bypass IE security</span>
+<span class="hljs-variable">$LocalTempDir</span> = <span class="hljs-variable">$env:TEMP</span>; <span class="hljs-variable">$ChromeInstaller</span> = <span class="hljs-string">&quot;ChromeInstaller.exe&quot;</span>; (<span class="hljs-built_in">new-object</span>    System.Net.WebClient).DownloadFile(<span class="hljs-string">&#x27;http://dl.google.com/chrome/install/375.126/chrome_installer.exe&#x27;</span>, <span class="hljs-string">&quot;<span class="hljs-variable">$LocalTempDir</span>\<span class="hljs-variable">$ChromeInstaller</span>&quot;</span>); &amp; <span class="hljs-string">&quot;<span class="hljs-variable">$LocalTempDir</span>\<span class="hljs-variable">$ChromeInstaller</span>&quot;</span> /silent /install; <span class="hljs-variable">$Process2Monitor</span> = <span class="hljs-string">&quot;ChromeInstaller&quot;</span>; <span class="hljs-keyword">Do</span> { <span class="hljs-variable">$ProcessesFound</span> = <span class="hljs-built_in">Get-Process</span> | ? { <span class="hljs-variable">$Process2Monitor</span> <span class="hljs-operator">-contains</span> <span class="hljs-variable">$_</span>.Name } | <span class="hljs-built_in">Select-Object</span> <span class="hljs-literal">-ExpandProperty</span> Name; <span class="hljs-keyword">If</span> (<span class="hljs-variable">$ProcessesFound</span>) { <span class="hljs-string">&quot;Still running: <span class="hljs-variable">$</span>(<span class="hljs-variable">$ProcessesFound</span> -join &#x27;, &#x27;)&quot;</span> | <span class="hljs-built_in">Write-Host</span>; <span class="hljs-built_in">Start-Sleep</span> <span class="hljs-literal">-Seconds</span> <span class="hljs-number">2</span> } <span class="hljs-keyword">else</span> { <span class="hljs-built_in">rm</span> <span class="hljs-string">&quot;<span class="hljs-variable">$LocalTempDir</span>\<span class="hljs-variable">$ChromeInstaller</span>&quot;</span> <span class="hljs-literal">-ErrorAction</span> SilentlyContinue <span class="hljs-literal">-Verbose</span> } } <span class="hljs-keyword">Until</span> (!<span class="hljs-variable">$ProcessesFound</span>)
+
+
+<span class="hljs-comment"># Get access to SqlWmiManagement DLL on the machine with SQL</span>
+<span class="hljs-comment"># we are on, which is where SQL Server was installed.</span>
+<span class="hljs-comment"># Note: this is installed in the GAC by SQL Server Setup.</span>
+
+[<span class="hljs-type">System.Reflection.Assembly</span>]::LoadWithPartialName(<span class="hljs-string">&#x27;Microsoft.SqlServer.SqlWmiManagement&#x27;</span>)
+
+<span class="hljs-comment"># Instantiate a ManagedComputer object which exposes primitives to control the</span>
+<span class="hljs-comment"># installation of SQL Server on this machine.</span>
+
+<span class="hljs-variable">$wmi</span> = <span class="hljs-built_in">New-Object</span> <span class="hljs-string">&#x27;Microsoft.SqlServer.Management.Smo.Wmi.ManagedComputer&#x27;</span> localhost
+
+<span class="hljs-comment"># Enable the TCP protocol on the default instance. If the instance is named,</span>
+<span class="hljs-comment"># replace MSSQLSERVER with the instance name in the following line.</span>
+
+<span class="hljs-variable">$tcp</span> = <span class="hljs-variable">$wmi</span>.ServerInstances[<span class="hljs-string">&#x27;MSSQLSERVER&#x27;</span>].ServerProtocols[<span class="hljs-string">&#x27;Tcp&#x27;</span>]
+<span class="hljs-variable">$tcp</span>.IsEnabled = <span class="hljs-variable">$true</span>
+<span class="hljs-variable">$tcp</span>.Alter()
+
+<span class="hljs-comment"># You need to restart SQL Server for the change to persist</span>
+<span class="hljs-comment"># -Force takes care of any dependent services, like SQL Agent.</span>
+<span class="hljs-comment"># Note: if the instance is named, replace MSSQLSERVER with MSSQL$ followed by</span>
+<span class="hljs-comment"># the name of the instance (e.g. MSSQL$MYINSTANCE)</span>
+
+<span class="hljs-built_in">Restart-Service</span> <span class="hljs-literal">-Name</span> MSSQLSERVER <span class="hljs-literal">-Force</span></code></pre><p>That&#39;s it! Everything else is going to come down what it is you are training with. Classic mirroring, Log Shipping, Availability Groups, Failover Cluster Instances, replication...
+this will meet the needs of just about anything you could want. If you get fancy, you can deploy it twice and work with Distributed Availability Groups.</p>
+<p>This template was designed with speed of infrastructure deployment in mind. I have provided some basic scripts to accelerate domain configuration. Everything else is up to you!</p>
 <hr>
 <h2 id="im-done-now-what"><a class="header-link" href="#im-done-now-what"></a><strong>I&#39;m Done! Now What?</strong></h2>
 <p>This is the easy part. Simply destroy the entire resource group.</p>
@@ -167,7 +236,7 @@ az deployment <span class="hljs-keyword">group</span> <span class="hljs-keyword"
 <p class="img-container"><img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure"></p>
 <h3 id="contributors"><a class="header-link" href="#contributors"></a><strong>Contributors</strong></h3>
 <hr>
-<p>Mark Cameron - MARKCAME - <a href="mailto:&#x4d;&#x41;&#x52;&#x4b;&#x43;&#x41;&#x4d;&#69;&#64;&#109;&#105;&#x63;&#114;&#111;&#115;&#x6f;&#x66;&#116;&#46;&#99;&#x6f;&#109;">&#x4d;&#x41;&#x52;&#x4b;&#x43;&#x41;&#x4d;&#69;&#64;&#109;&#105;&#x63;&#114;&#111;&#115;&#x6f;&#x66;&#116;&#46;&#99;&#x6f;&#109;</a></p>
+<p>Mark Cameron - MARKCAME - <a href="mailto:&#x4d;&#65;&#82;&#75;&#67;&#x41;&#77;&#x45;&#x40;&#109;&#105;&#x63;&#x72;&#111;&#115;&#x6f;&#x66;&#116;&#x2e;&#99;&#111;&#x6d;">&#x4d;&#65;&#82;&#75;&#67;&#x41;&#77;&#x45;&#x40;&#109;&#105;&#x63;&#x72;&#111;&#115;&#x6f;&#x66;&#116;&#x2e;&#99;&#111;&#x6d;</a></p>
 <hr>
 <h4 id="tools-used"><a class="header-link" href="#tools-used"></a><strong>Tools used</strong></h4>
 <hr>

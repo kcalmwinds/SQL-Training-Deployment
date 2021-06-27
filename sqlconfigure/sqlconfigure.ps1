@@ -1,4 +1,3 @@
-#use this to install azure cli to support the rest of the template process. 
 # If you modified the ARM template in any way, please adjust the appropriate commands below
 
 
