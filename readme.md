@@ -54,9 +54,9 @@ This package is to be used for deploying 4 servers.
 
 This deployment does not attach any disks or preconfigure stripting. Each VM deploys with the OS disk sized at 1tb. Though data disks are not attached, there is nothing stopping an engineer from practicing how to work with Storage Spaces and Deploying Azure Managed Disks to do striping exercises.
 
-SQL VM agent IS installed but i only configured it enough to make access to SQL Server private within vnet, port 1433 open, and configure SQL Login to adminuser/Password123!.
+SQL VM agent is installed but it is only configured enough to access SQL Server to configure connectivity private within vnet, port 1433 open, and configure SQL Login to adminuser/Password123!.
 
-> With the above written, this is not meant to host or contain actual user data. If you do use this environment for reproduction purposes, **CHANGE THE USERNAME AND PASSWORD IN THE PARAMETER FILE**
+> With the above written, this is not meant to host or contain actual user data. If you do use this environment for production or reproduction purposes, **CHANGE THE USERNAME AND PASSWORD IN THE PARAMETER FILE**
 
 ```JSON
 {
@@ -69,7 +69,7 @@ SQL VM agent IS installed but i only configured it enough to make access to SQL 
 }
 ```
 
-Bastion connectivity was implemented due to corporate policy pushed to deployments creating very restrictive Network Security Group rules that make it very difficult to use RDP. Bastion bypasses all of that and hosts the RDP session directly in the browser through the Azure portal.
+Bastion connectivity was implemented due to policy pushed to deployments in some organizations creating very restrictive Network Security Group rules that make it very difficult to use RDP. Bastion bypasses all of that and hosts the RDP session directly in the browser through the Azure portal.
 
 With Bastion, you can only copy and paste text to and from your local machine to the remote machine and back. It shares a clipboard. There will be some steps where you will do exactly this and when using hte DNS configuration file, you will need to copy the contents of the XML file locally into a new xml file on the remote machine.
 
@@ -139,7 +139,7 @@ stuff
 This is the easy part. Simply destroy the entire resource group.
 
 ```
-az group delete -g SqlTrainRGT -y
+az group delete -g SqlTrainRG -y
 ```
 
 It does not need to be monitored. Destroying the resource group will destroy all deployed resources. This follows the model of:

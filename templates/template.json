@@ -626,7 +626,11 @@
             "location": "[parameters('azureLocation')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddresses_BastEndpoint_name'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_SQLVnet_name'), 'AzureBastionSubnet')]"
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_SQLVnet_name'), 'AzureBastionSubnet')]",
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_SQL1VM_name'))]",
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('VirtualMachines_SQL2VM_name'))]",
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_SQL3VM_name'))]",
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_SQLDCVM_name'))]"
             ],
             "sku": {
                 "name": "Basic"
