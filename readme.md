@@ -26,6 +26,7 @@ This package is to be used for deploying 4 servers.
   - subnet for Bastion
   - preconfigured DNS entry for 10.2.0.4
   - 3 SQLVM Resource Providers
+  - 1 Availability Set for all 3 SQL Servers
 
 - Powershell script to install AzureCLI on your local machine
 - Script to create the DC and AD for SQLTRAIN.com

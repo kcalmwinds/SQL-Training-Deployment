@@ -63,6 +63,20 @@
         },
         "osandSQLPw": {
             "type": "string"
+        },
+        "azureLocation": {
+            "type": "string",
+            "defaultValue": "centralus",
+            "metadata": {
+                "description": "Global region to deploy to"
+            }
+        },
+        "sqlAS": {
+            "type": "string",
+            "defaultValue": "SQLAS",
+            "metadata": {
+                "description": "Availability Set to deploy VMs into."
+            }
         }
 
     },
@@ -72,7 +86,7 @@
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2020-11-01",
             "name": "[parameters('publicIPAddresses_BastEndpoint_name')]",
-            "location": "centralus",
+            "location": "[parameters('azureLocation')]",
             "sku": {
                 "name": "Standard",
                 "tier": "Regional"
@@ -86,10 +100,23 @@
             }
         },
         {
+            "name": "[parameters('sqlAS')]",
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "2020-12-01",
+            "location": "[parameters('azureLocation')]",
+            "properties": {
+                "platformFaultDomainCount": 2,
+                "platformUpdateDomainCount": 5
+            },
+            "sku": {
+                "name": "Aligned"
+            }
+        },
+        {
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2021-03-01",
             "name": "[parameters('virtualMachines_SQLDCVM_name')]",
-            "location": "centralus",
+            "location": "[parameters('azureLocation')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_SQLdcvmNIC_name'))]"
             ],
@@ -151,9 +178,10 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2021-03-01",
             "name": "[parameters('virtualMachines_SQL2VM_name')]",
-            "location": "centralus",
+            "location": "[parameters('azureLocation')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_SQL2vmNIC_name'))]"
+                "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_SQL2vmNIC_name'))]",
+                "[resourceId('Microsoft.Compute/availabilitySets', parameters('sqlAS'))]"
 
             ],
             "properties": {
@@ -178,6 +206,9 @@
                         "diskSizeGB": 1024
                     }
 
+                },
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('sqlAS'))]"
                 },
                 "osProfile": {
                     "computerName": "[parameters('virtualMachines_SQL2VM_name')]",
@@ -213,9 +244,10 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2021-03-01",
             "name": "[parameters('virtualMachines_SQL1VM_name')]",
-            "location": "centralus",
+            "location": "[parameters('azureLocation')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_SQL1vmNIC_name'))]"
+                "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_SQL1vmNIC_name'))]",
+                "[resourceId('Microsoft.Compute/availabilitySets', parameters('sqlAS'))]"
             ],
             "properties": {
                 "hardwareProfile": {
@@ -239,6 +271,9 @@
                         "diskSizeGB": 1024
                     }
 
+                },
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('sqlAS'))]"
                 },
                 "osProfile": {
                     "computerName": "[parameters('virtualMachines_SQL1VM_name')]",
@@ -274,9 +309,10 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2021-03-01",
             "name": "[parameters('virtualMachines_SQL3VM_name')]",
-            "location": "centralus",
+            "location": "[parameters('azureLocation')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_SQL3vmNIC_name'))]"
+                "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_SQL3vmNIC_name'))]",
+                "[resourceId('Microsoft.Compute/availabilitySets', parameters('sqlAS'))]"
 
             ],
             "properties": {
@@ -300,6 +336,9 @@
                         },
                         "diskSizeGB": 1024
                     }
+                },
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('sqlAS'))]"
                 },
                 "osProfile": {
                     "computerName": "[parameters('virtualMachines_SQL3VM_name')]",
@@ -335,7 +374,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2020-11-01",
             "name": "[parameters('networkInterfaces_SQLdcvmNIC_name')]",
-            "location": "centralus",
+            "location": "[parameters('azureLocation')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_SQLVnet_name'), 'default')]"
             ],
@@ -365,7 +404,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2020-11-01",
             "name": "[parameters('networkInterfaces_SQL2vmNIC_name')]",
-            "location": "centralus",
+            "location": "[parameters('azureLocation')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_SQLVnet_name'), 'default')]"
             ],
@@ -395,7 +434,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2020-11-01",
             "name": "[parameters('networkInterfaces_SQL1vmNIC_name')]",
-            "location": "centralus",
+            "location": "[parameters('azureLocation')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_SQLVnet_name'), 'default')]"
             ],
@@ -425,7 +464,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2020-11-01",
             "name": "[parameters('networkInterfaces_SQL3vmNIC_name')]",
-            "location": "centralus",
+            "location": "[parameters('azureLocation')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_SQLVnet_name'), 'default')]"
             ],
@@ -455,7 +494,7 @@
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2020-11-01",
             "name": "[parameters('virtualNetworks_SQLVnet_name')]",
-            "location": "centralus",
+            "location": "[parameters('azureLocation')]",
             "dependsOn": [
             ],
             "properties": {
@@ -511,7 +550,7 @@
             "type": "Microsoft.SqlVirtualMachine/sqlVirtualMachines",
             "apiVersion": "2017-03-01-preview",
             "name": "[parameters('sqlVirtualMachines_SQL2VM_name')]",
-            "location": "centralus",
+            "location": "[parameters('azureLocation')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_SQL2VM_name'))]"
             ],
@@ -535,7 +574,7 @@
             "type": "Microsoft.SqlVirtualMachine/sqlVirtualMachines",
             "apiVersion": "2017-03-01-preview",
             "name": "[parameters('sqlVirtualMachines_SQL1VM_name')]",
-            "location": "centralus",
+            "location": "[parameters('azureLocation')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_SQL1VM_name'))]"
             ],
@@ -559,7 +598,7 @@
             "type": "Microsoft.SqlVirtualMachine/sqlVirtualMachines",
             "apiVersion": "2017-03-01-preview",
             "name": "[parameters('sqlVirtualMachines_SQL3VM_name')]",
-            "location": "centralus",
+            "location": "[parameters('azureLocation')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_SQL3VM_name'))]"
             ],
@@ -584,10 +623,14 @@
             "type": "Microsoft.Network/bastionHosts",
             "apiVersion": "2020-11-01",
             "name": "[parameters('bastionHosts_SQLbastion_name')]",
-            "location": "centralus",
+            "location": "[parameters('azureLocation')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddresses_BastEndpoint_name'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_SQLVnet_name'), 'AzureBastionSubnet')]"
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_SQLVnet_name'), 'AzureBastionSubnet')]",
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_SQL1VM_name'))]",
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('VirtualMachines_SQL2VM_name'))]",
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_SQL3VM_name'))]",
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_SQLDCVM_name'))]"
             ],
             "sku": {
                 "name": "Basic"

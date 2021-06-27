@@ -49,6 +49,12 @@
         },
         "osandSQLPw": {
             "value": "Password123!"
+        },
+        "azureLocation": {
+            "value": "centralus"
+        },
+        "sqlAS": {
+            "value": "SQLAS"
         }
     }
 }
