@@ -1,6 +1,4 @@
 az group create -g SqlTrainRG -l centralus
 
-az deployment group validate -f .\templates\template.json -p .\templates\parameters.json -g SqlTrainRG 
-
 az deployment group create -g sqlTrainRG -f .\templates\template.json -p .\templates\parameters.json
 
