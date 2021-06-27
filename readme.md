@@ -174,7 +174,6 @@ It will prompt you for the password. Enter it and the VM will restart. Do not cl
 This is where the majority of the configuration happens. You will find all the things this powershell does at the top of the document.
 
 ```powershell
-#use this to install azure cli to support the rest of the template process.
 # If you modified the ARM template in any way, please adjust the appropriate commands below
 
 
