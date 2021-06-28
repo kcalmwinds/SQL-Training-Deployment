@@ -47,7 +47,7 @@ This package is to be used for deploying 4 servers.
   - Install latest SQLSERVER cmdlets
   - Install AzureCLI
   - Install Google Chrome to bypass IE Security to get other tools
-  - Creates login for SQLVM1, 2, and 3 and makes them SA on all SQL Server Instances
+  - Creates Windows login for SQLVM1, 2, and 3 and makes them SA on all SQL Server Instances
   - Enables TCP for SQL Server (Developer default is disabled)
   - Creates a directory C:\Adventureworks and Downloads Adventureworks2017.bak
   - Creates a folder C:\snapshot _for replications practice_
