@@ -177,7 +177,7 @@ It will prompt you for the password. Enter it and the VM will restart. Do not cl
 
 ---
 
-This is where the majority of the configuration happens. You will find all the things this powershell does at the top of the document.
+This is where the majority of the configuration happens. You will find all the things this powershell does at the top of the document. Open up an administrator PowerShell console and run the following.
 
 ```powershell
 # If you modified the ARM template in any way, please adjust the appropriate commands below
