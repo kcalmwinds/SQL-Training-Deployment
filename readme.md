@@ -79,7 +79,7 @@ SQL VM agent is installed but it is only configured enough to access SQL Server 
 
 Bastion connectivity was implemented due to policy pushed to deployments in some organizations creating very restrictive Network Security Group rules that make it very difficult to use RDP. Bastion bypasses all of that and hosts the RDP session directly in the browser through the Azure portal.
 
-With Bastion, you can only copy and paste text to and from your local machine to the remote machine and back. It shares a clipboard. There will be some steps where you will do exactly this and when using hte DNS configuration file, you will need to copy the contents of the XML file locally into a new xml file on the remote machine.
+With Bastion, you can only copy and paste text to and from your local machine. There will be some steps where you will do exactly this.
 
 ---
 
