@@ -63,5 +63,8 @@ $tcp.Alter()
 # the name of the instance (e.g. MSSQL$MYINSTANCE)
 
 Restart-Service -Name MSSQLSERVER -Force
+Install-WindowsFeature -Name Failover-Clustering –IncludeManagementTools
 
+# just in case local admin is still logged in
+Restart-Computer -force 
 

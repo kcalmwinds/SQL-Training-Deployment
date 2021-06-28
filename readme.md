@@ -50,7 +50,8 @@ This package is to be used for deploying 4 servers.
   - Creates Windows login for SQLVM1, 2, and 3 and makes them SA on all SQL Server Instances
   - Enables TCP for SQL Server (Developer default is disabled)
   - Creates a directory C:\Adventureworks and Downloads Adventureworks2017.bak
-  - Creates a folder C:\snapshot _for replications practice_
+  - Creates a folder C:\snapshot \for replications practice
+  - Installs Windows Failover Cluster feature with Management Tools
 
 ---
 
@@ -245,6 +246,11 @@ $tcp.Alter()
 # the name of the instance (e.g. MSSQL$MYINSTANCE)
 
 Restart-Service -Name MSSQLSERVER -Force
+Install-WindowsFeature -Name Failover-Clustering –IncludeManagementTools
+
+# just in case local admin is still logged in
+Restart-Computer -force
+
 ```
 
 Now you can administrate SQL Server using the domain login. Close the bastion Tabs and reconnect using adminuser@sqltrain.com with the same password.
