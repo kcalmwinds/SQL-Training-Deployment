@@ -172,7 +172,8 @@ mkdir c:\adventureworks
 <span class="hljs-built_in">New-NetFirewallRule</span> <span class="hljs-literal">-DisplayName</span> <span class="hljs-string">&quot;SQLEndpoint&quot;</span> <span class="hljs-literal">-Direction</span> Inbound <span class="hljs-literal">-protocol</span> TCP <span class="hljs-literal">-LocalPort</span> <span class="hljs-number">1433</span>  <span class="hljs-literal">-Action</span> Allow <span class="hljs-literal">-Enabled</span> True
 <span class="hljs-built_in">New-NetFirewallRule</span> <span class="hljs-literal">-DisplayName</span> <span class="hljs-string">&quot;SQLHADREndpoint&quot;</span> <span class="hljs-literal">-Direction</span> Inbound  <span class="hljs-literal">-protocol</span> TCP <span class="hljs-literal">-LocalPort</span> <span class="hljs-number">5022</span>  <span class="hljs-literal">-Action</span> Allow <span class="hljs-literal">-Enabled</span> True
 <span class="hljs-built_in">New-NetFirewallRule</span> <span class="hljs-literal">-DisplayName</span> <span class="hljs-string">&quot;Healthprobe&quot;</span> <span class="hljs-literal">-Direction</span> Inbound <span class="hljs-literal">-protocol</span> TCP <span class="hljs-literal">-LocalPort</span> <span class="hljs-number">59999</span> <span class="hljs-literal">-Action</span> Allow <span class="hljs-literal">-Enabled</span> True
-
+<span class="hljs-built_in">Enable-NetFirewallRule</span> <span class="hljs-literal">-DisplayName</span> <span class="hljs-string">&quot;Windows Management Instrumentation (WMI-In)&quot;</span>
+<span class="hljs-built_in">Enable-NetFirewallRule</span> <span class="hljs-literal">-DisplayName</span> <span class="hljs-string">&quot;Windows Management Instrumentation (DCOM-In)&quot;</span>
 
 <span class="hljs-comment"># latest sqlserver cmdlets</span>
 <span class="hljs-built_in">install-module</span> sqlserver <span class="hljs-literal">-AllowClobber</span> <span class="hljs-literal">-Force</span>
@@ -225,7 +226,8 @@ mkdir c:\snapshot
 
 <span class="hljs-comment"># just in case local admin is still logged in</span>
 <span class="hljs-built_in">Restart-Computer</span> <span class="hljs-literal">-force</span>
-</code></pre><p>Now you can administrate SQL Server using the domain login. Close the bastion Tabs and reconnect using <a href="mailto:&#x61;&#100;&#109;&#105;&#x6e;&#x75;&#115;&#101;&#114;&#64;&#115;&#113;&#x6c;&#116;&#x72;&#97;&#105;&#110;&#46;&#99;&#111;&#x6d;">&#x61;&#100;&#109;&#105;&#x6e;&#x75;&#115;&#101;&#114;&#64;&#115;&#113;&#x6c;&#116;&#x72;&#97;&#105;&#110;&#46;&#99;&#111;&#x6d;</a> with the same password.</p>
+
+</code></pre><p>Now you can administrate SQL Server using the domain login. Close the bastion Tabs and reconnect using <a href="mailto:&#x61;&#x64;&#x6d;&#x69;&#x6e;&#x75;&#x73;&#x65;&#114;&#x40;&#115;&#x71;&#108;&#116;&#x72;&#x61;&#105;&#x6e;&#46;&#99;&#111;&#109;">&#x61;&#x64;&#x6d;&#x69;&#x6e;&#x75;&#x73;&#x65;&#114;&#x40;&#115;&#x71;&#108;&#116;&#x72;&#x61;&#105;&#x6e;&#46;&#99;&#111;&#109;</a> with the same password.</p>
 <p>That&#39;s it! Everything else is going to come down what it is you are training with. Classic mirroring, Log Shipping, Availability Groups, Failover Cluster Instances, replication...
 this will meet the needs of just about anything you could want. If you get fancy, you can deploy it twice and work with Distributed Availability Groups.</p>
 <p>This template was designed with speed of infrastructure deployment in mind. I have provided some basic scripts to accelerate domain configuration. Everything else is up to you!</p>
@@ -243,7 +245,7 @@ this will meet the needs of just about anything you could want. If you get fancy
 <p><a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fkcalmwinds%2FSQL-Training-Deployment%2Fmain%2Ftemplates%2Ftemplate.json"><img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure"></a></p>
 <h3 id="contributors"><a class="header-link" href="#contributors"></a><strong>Contributors</strong></h3>
 <hr>
-<p>Mark Cameron - MARKCAME - <a href="mailto:&#77;&#65;&#82;&#75;&#x43;&#x41;&#x4d;&#69;&#64;&#x6d;&#105;&#99;&#x72;&#111;&#x73;&#111;&#102;&#116;&#46;&#99;&#111;&#109;">&#77;&#65;&#82;&#75;&#x43;&#x41;&#x4d;&#69;&#64;&#x6d;&#105;&#99;&#x72;&#111;&#x73;&#111;&#102;&#116;&#46;&#99;&#111;&#109;</a></p>
+<p>Mark Cameron - MARKCAME - <a href="mailto:&#x4d;&#65;&#82;&#x4b;&#67;&#x41;&#77;&#69;&#x40;&#x6d;&#105;&#99;&#114;&#x6f;&#x73;&#x6f;&#x66;&#116;&#x2e;&#x63;&#111;&#x6d;">&#x4d;&#65;&#82;&#x4b;&#67;&#x41;&#77;&#69;&#x40;&#x6d;&#105;&#99;&#114;&#x6f;&#x73;&#x6f;&#x66;&#116;&#x2e;&#x63;&#111;&#x6d;</a></p>
 <hr>
 <h4 id="tools-used"><a class="header-link" href="#tools-used"></a><strong>Tools used</strong></h4>
 <hr>

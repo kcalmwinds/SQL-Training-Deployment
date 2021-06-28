@@ -197,7 +197,8 @@ Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI
 New-NetFirewallRule -DisplayName "SQLEndpoint" -Direction Inbound -protocol TCP -LocalPort 1433  -Action Allow -Enabled True
 New-NetFirewallRule -DisplayName "SQLHADREndpoint" -Direction Inbound  -protocol TCP -LocalPort 5022  -Action Allow -Enabled True
 New-NetFirewallRule -DisplayName "Healthprobe" -Direction Inbound -protocol TCP -LocalPort 59999 -Action Allow -Enabled True
-
+Enable-NetFirewallRule -DisplayName "Windows Management Instrumentation (WMI-In)"
+Enable-NetFirewallRule -DisplayName "Windows Management Instrumentation (DCOM-In)"
 
 # latest sqlserver cmdlets
 install-module sqlserver -AllowClobber -Force
@@ -250,6 +251,7 @@ Install-WindowsFeature -Name Failover-Clustering –IncludeManagementTools
 
 # just in case local admin is still logged in
 Restart-Computer -force
+
 
 ```
 
