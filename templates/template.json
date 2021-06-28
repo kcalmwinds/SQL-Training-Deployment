@@ -27,7 +27,7 @@
             "type": "String"
         },
         "networkInterfaces_SQLdcvmNIC_name": {
-            "defaultValue": "SQLdcvm58",
+            "defaultValue": "SQLdcvmNIC",
             "type": "String"
         },
         "networkInterfaces_SQL1vmNIC_name": {
@@ -59,13 +59,13 @@
             "type": "String"
         },
         "osAndSQLLogin": {
-            "type": "string"
+            "type": "String"
         },
         "osandSQLPw": {
-            "type": "string"
+            "type": "secureString"
         },
         "azureLocation": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "centralus",
             "metadata": {
                 "description": "Global region to deploy to"
