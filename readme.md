@@ -247,6 +247,8 @@ $tcp.Alter()
 Restart-Service -Name MSSQLSERVER -Force
 ```
 
+Now you can administrate SQL Server using the domain login. Close the bastion Tabs and reconnect using adminuser@sqltrain.com with the same password.
+
 That's it! Everything else is going to come down what it is you are training with. Classic mirroring, Log Shipping, Availability Groups, Failover Cluster Instances, replication...
 this will meet the needs of just about anything you could want. If you get fancy, you can deploy it twice and work with Distributed Availability Groups.
 
