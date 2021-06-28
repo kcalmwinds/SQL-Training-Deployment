@@ -6,6 +6,12 @@
 
 ---
 
+```git
+git clone https://github.com/kcalmwinds/SQL-Training-Deployment.git
+```
+
+---
+
 ### **What's Inside?**
 
 ---
