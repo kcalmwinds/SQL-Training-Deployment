@@ -1,7 +1,7 @@
 
 
 #to be run on the to-be domain controller
-install-windowsfeature -Name "dns" -IncludeAllSubFeature -IncludeManagementTools 
+install-windowsfeature -Name "dns", "AD-Domain-Services" -IncludeAllSubFeature -IncludeManagementTools
 #
 # Windows PowerShell script for AD DS Deployment
 #

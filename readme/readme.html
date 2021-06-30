@@ -127,7 +127,7 @@ az deployment <span class="hljs-keyword">group</span> <span class="hljs-keyword"
 <p>In your Bastion session to <strong>SQLDCVM</strong>, create a text file then copy and paste the contents of ./create_dns_ad/DNSConfigTemplate.xml into the new text file and save it. Change the .txt extension to .xml. You may have use the view ribbon in File Explorer to enable showing extensions to properly change it.</p>
 <p>Open an administrative PowerShell console on <strong>SQLDCVM</strong> and run:</p>
 <pre class="hljs"><code><span class="hljs-comment">#to be run on the to-be domain controller</span>
-<span class="hljs-built_in">install-windowsfeature</span> <span class="hljs-literal">-Name</span> <span class="hljs-string">&quot;dns&quot;</span> <span class="hljs-literal">-IncludeAllSubFeature</span> <span class="hljs-literal">-IncludeManagementTools</span>
+<span class="hljs-built_in">install-windowsfeature</span> <span class="hljs-literal">-Name</span> <span class="hljs-string">&quot;dns&quot;</span>, <span class="hljs-string">&quot;AD-Domain-Services&quot;</span> <span class="hljs-literal">-IncludeAllSubFeature</span> <span class="hljs-literal">-IncludeManagementTools</span>
 <span class="hljs-comment">#</span>
 <span class="hljs-comment"># Windows PowerShell script for AD DS Deployment</span>
 <span class="hljs-comment">#</span>
@@ -227,7 +227,7 @@ mkdir c:\snapshot
 <span class="hljs-comment"># just in case local admin is still logged in</span>
 <span class="hljs-built_in">Restart-Computer</span> <span class="hljs-literal">-force</span>
 
-</code></pre><p>Now you can administrate SQL Server using the domain login. Close the bastion Tabs and reconnect using <a href="mailto:&#x61;&#x64;&#109;&#x69;&#x6e;&#x75;&#115;&#101;&#114;&#64;&#x73;&#x71;&#x6c;&#116;&#114;&#97;&#x69;&#x6e;&#46;&#x63;&#111;&#109;">&#x61;&#x64;&#109;&#x69;&#x6e;&#x75;&#115;&#101;&#114;&#64;&#x73;&#x71;&#x6c;&#116;&#114;&#97;&#x69;&#x6e;&#46;&#x63;&#111;&#109;</a> with the same password.</p>
+</code></pre><p>Now you can administrate SQL Server using the domain login. Close the bastion Tabs and reconnect using <a href="mailto:&#x61;&#x64;&#109;&#105;&#110;&#x75;&#x73;&#101;&#114;&#x40;&#115;&#113;&#108;&#116;&#114;&#97;&#105;&#110;&#x2e;&#99;&#x6f;&#x6d;">&#x61;&#x64;&#109;&#105;&#110;&#x75;&#x73;&#101;&#114;&#x40;&#115;&#113;&#108;&#116;&#114;&#97;&#105;&#110;&#x2e;&#99;&#x6f;&#x6d;</a> with the same password.</p>
 <p>That&#39;s it! Everything else is going to come down what it is you are training with. Classic mirroring, Log Shipping, Availability Groups, Failover Cluster Instances, replication...
 this will meet the needs of just about anything you could want. If you get fancy, you can deploy it twice and work with Distributed Availability Groups.</p>
 <p>This template was designed with speed of infrastructure deployment in mind. I have provided some basic scripts to accelerate domain configuration. Everything else is up to you!</p>
@@ -245,7 +245,7 @@ this will meet the needs of just about anything you could want. If you get fancy
 <p><a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fkcalmwinds%2FSQL-Training-Deployment%2Fmain%2Ftemplates%2Ftemplate.json"><img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure"></a></p>
 <h3 id="contributors"><a class="header-link" href="#contributors"></a><strong>Contributors</strong></h3>
 <hr>
-<p>Mark Cameron - MARKCAME - <a href="mailto:&#x4d;&#65;&#x52;&#x4b;&#x43;&#x41;&#77;&#x45;&#x40;&#x6d;&#105;&#x63;&#x72;&#111;&#115;&#x6f;&#x66;&#x74;&#x2e;&#x63;&#x6f;&#x6d;">&#x4d;&#65;&#x52;&#x4b;&#x43;&#x41;&#77;&#x45;&#x40;&#x6d;&#105;&#x63;&#x72;&#111;&#115;&#x6f;&#x66;&#x74;&#x2e;&#x63;&#x6f;&#x6d;</a></p>
+<p>Mark Cameron - MARKCAME - <a href="mailto:&#x4d;&#65;&#82;&#x4b;&#67;&#x41;&#77;&#x45;&#x40;&#x6d;&#105;&#99;&#x72;&#111;&#115;&#111;&#x66;&#116;&#x2e;&#99;&#111;&#x6d;">&#x4d;&#65;&#82;&#x4b;&#67;&#x41;&#77;&#x45;&#x40;&#x6d;&#105;&#99;&#x72;&#111;&#115;&#111;&#x66;&#116;&#x2e;&#99;&#111;&#x6d;</a></p>
 <hr>
 <h4 id="tools-used"><a class="header-link" href="#tools-used"></a><strong>Tools used</strong></h4>
 <hr>
