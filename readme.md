@@ -133,7 +133,7 @@ Open an administrative PowerShell console on **SQLDCVM** and run:
 
 ```powershell
 #to be run on the to-be domain controller
-Install-WindowsFeature -ConfigurationFilePath DNSConfigTemplate.xml
+install-windowsfeature -Name "dns" -IncludeAllSubFeature -IncludeManagementTools
 #
 # Windows PowerShell script for AD DS Deployment
 #
