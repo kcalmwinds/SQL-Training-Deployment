@@ -182,15 +182,13 @@ This is where the majority of the configuration happens. You will find all the t
 
 ```powershell
 # If you modified the ARM template in any way, please adjust the appropriate commands below
+# latest sqlserver cmdlets
+install-module sqlserver -AllowClobber -Force
 
 
 #get adventureworks2017
 mkdir c:\adventureworks
 Invoke-WebRequest -Uri https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2017.bak -OutFile c:\adventureworks\AdventureWorks2017.bak
-
-
-#use this to install azure cli
-Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
 
 
 # Firewall Rules
@@ -199,6 +197,7 @@ New-NetFirewallRule -DisplayName "SQLHADREndpoint" -Direction Inbound  -protocol
 New-NetFirewallRule -DisplayName "Healthprobe" -Direction Inbound -protocol TCP -LocalPort 59999 -Action Allow -Enabled True
 Enable-NetFirewallRule -DisplayName "Windows Management Instrumentation (WMI-In)"
 Enable-NetFirewallRule -DisplayName "Windows Management Instrumentation (DCOM-In)"
+
 
 # latest sqlserver cmdlets
 install-module sqlserver -AllowClobber -Force
@@ -251,8 +250,6 @@ Install-WindowsFeature -Name Failover-Clustering –IncludeManagementTools
 
 # just in case local admin is still logged in
 Restart-Computer -force
-
-
 ```
 
 Now you can administrate SQL Server using the domain login. Close the bastion Tabs and reconnect using adminuser@sqltrain.com with the same password.

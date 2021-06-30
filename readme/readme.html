@@ -157,15 +157,13 @@ az deployment <span class="hljs-keyword">group</span> <span class="hljs-keyword"
 <hr>
 <p>This is where the majority of the configuration happens. You will find all the things this powershell does at the top of the document. Open up an administrator PowerShell console and run the following.</p>
 <pre class="hljs"><code><span class="hljs-comment"># If you modified the ARM template in any way, please adjust the appropriate commands below</span>
+<span class="hljs-comment"># latest sqlserver cmdlets</span>
+<span class="hljs-built_in">install-module</span> sqlserver <span class="hljs-literal">-AllowClobber</span> <span class="hljs-literal">-Force</span>
 
 
 <span class="hljs-comment">#get adventureworks2017</span>
 mkdir c:\adventureworks
 <span class="hljs-built_in">Invoke-WebRequest</span> <span class="hljs-literal">-Uri</span> https://github.com/Microsoft/sql<span class="hljs-literal">-server</span><span class="hljs-literal">-samples</span>/releases/download/adventureworks/AdventureWorks2017.bak <span class="hljs-literal">-OutFile</span> c:\adventureworks\AdventureWorks2017.bak
-
-
-<span class="hljs-comment">#use this to install azure cli</span>
-<span class="hljs-built_in">Invoke-WebRequest</span> <span class="hljs-literal">-Uri</span> https://aka.ms/installazurecliwindows <span class="hljs-literal">-OutFile</span> .\AzureCLI.msi; <span class="hljs-built_in">Start-Process</span> msiexec.exe <span class="hljs-literal">-Wait</span> <span class="hljs-literal">-ArgumentList</span> <span class="hljs-string">&#x27;/I AzureCLI.msi /quiet&#x27;</span>; <span class="hljs-built_in">rm</span> .\AzureCLI.msi
 
 
 <span class="hljs-comment"># Firewall Rules</span>
@@ -174,6 +172,7 @@ mkdir c:\adventureworks
 <span class="hljs-built_in">New-NetFirewallRule</span> <span class="hljs-literal">-DisplayName</span> <span class="hljs-string">&quot;Healthprobe&quot;</span> <span class="hljs-literal">-Direction</span> Inbound <span class="hljs-literal">-protocol</span> TCP <span class="hljs-literal">-LocalPort</span> <span class="hljs-number">59999</span> <span class="hljs-literal">-Action</span> Allow <span class="hljs-literal">-Enabled</span> True
 <span class="hljs-built_in">Enable-NetFirewallRule</span> <span class="hljs-literal">-DisplayName</span> <span class="hljs-string">&quot;Windows Management Instrumentation (WMI-In)&quot;</span>
 <span class="hljs-built_in">Enable-NetFirewallRule</span> <span class="hljs-literal">-DisplayName</span> <span class="hljs-string">&quot;Windows Management Instrumentation (DCOM-In)&quot;</span>
+
 
 <span class="hljs-comment"># latest sqlserver cmdlets</span>
 <span class="hljs-built_in">install-module</span> sqlserver <span class="hljs-literal">-AllowClobber</span> <span class="hljs-literal">-Force</span>
@@ -225,9 +224,7 @@ mkdir c:\snapshot
 <span class="hljs-built_in">Install-WindowsFeature</span> <span class="hljs-literal">-Name</span> Failover<span class="hljs-literal">-Clustering</span> –IncludeManagementTools
 
 <span class="hljs-comment"># just in case local admin is still logged in</span>
-<span class="hljs-built_in">Restart-Computer</span> <span class="hljs-literal">-force</span>
-
-</code></pre><p>Now you can administrate SQL Server using the domain login. Close the bastion Tabs and reconnect using <a href="mailto:&#x61;&#x64;&#109;&#105;&#110;&#x75;&#x73;&#101;&#114;&#x40;&#115;&#113;&#108;&#116;&#114;&#97;&#105;&#110;&#x2e;&#99;&#x6f;&#x6d;">&#x61;&#x64;&#109;&#105;&#110;&#x75;&#x73;&#101;&#114;&#x40;&#115;&#113;&#108;&#116;&#114;&#97;&#105;&#110;&#x2e;&#99;&#x6f;&#x6d;</a> with the same password.</p>
+<span class="hljs-built_in">Restart-Computer</span> <span class="hljs-literal">-force</span></code></pre><p>Now you can administrate SQL Server using the domain login. Close the bastion Tabs and reconnect using <a href="mailto:&#x61;&#x64;&#x6d;&#x69;&#x6e;&#117;&#115;&#101;&#114;&#64;&#115;&#113;&#x6c;&#116;&#114;&#x61;&#105;&#x6e;&#46;&#x63;&#x6f;&#x6d;">&#x61;&#x64;&#x6d;&#x69;&#x6e;&#117;&#115;&#101;&#114;&#64;&#115;&#113;&#x6c;&#116;&#114;&#x61;&#105;&#x6e;&#46;&#x63;&#x6f;&#x6d;</a> with the same password.</p>
 <p>That&#39;s it! Everything else is going to come down what it is you are training with. Classic mirroring, Log Shipping, Availability Groups, Failover Cluster Instances, replication...
 this will meet the needs of just about anything you could want. If you get fancy, you can deploy it twice and work with Distributed Availability Groups.</p>
 <p>This template was designed with speed of infrastructure deployment in mind. I have provided some basic scripts to accelerate domain configuration. Everything else is up to you!</p>
@@ -245,7 +242,7 @@ this will meet the needs of just about anything you could want. If you get fancy
 <p><a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fkcalmwinds%2FSQL-Training-Deployment%2Fmain%2Ftemplates%2Ftemplate.json"><img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure"></a></p>
 <h3 id="contributors"><a class="header-link" href="#contributors"></a><strong>Contributors</strong></h3>
 <hr>
-<p>Mark Cameron - MARKCAME - <a href="mailto:&#x4d;&#65;&#82;&#x4b;&#67;&#x41;&#77;&#x45;&#x40;&#x6d;&#105;&#99;&#x72;&#111;&#115;&#111;&#x66;&#116;&#x2e;&#99;&#111;&#x6d;">&#x4d;&#65;&#82;&#x4b;&#67;&#x41;&#77;&#x45;&#x40;&#x6d;&#105;&#99;&#x72;&#111;&#115;&#111;&#x66;&#116;&#x2e;&#99;&#111;&#x6d;</a></p>
+<p>Mark Cameron - MARKCAME - <a href="mailto:&#x4d;&#65;&#x52;&#75;&#67;&#65;&#x4d;&#69;&#64;&#109;&#x69;&#x63;&#x72;&#111;&#x73;&#111;&#x66;&#x74;&#x2e;&#x63;&#111;&#x6d;">&#x4d;&#65;&#x52;&#75;&#67;&#65;&#x4d;&#69;&#64;&#109;&#x69;&#x63;&#x72;&#111;&#x73;&#111;&#x66;&#x74;&#x2e;&#x63;&#111;&#x6d;</a></p>
 <hr>
 <h4 id="tools-used"><a class="header-link" href="#tools-used"></a><strong>Tools used</strong></h4>
 <hr>
