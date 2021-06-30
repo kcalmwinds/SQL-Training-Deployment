@@ -154,7 +154,7 @@ az deployment <span class="hljs-keyword">group</span> <span class="hljs-keyword"
 <hr>
 <h4 id="5-sqlconfigure-configuring-sql-on-all-nodes"><a class="header-link" href="#5-sqlconfigure-configuring-sql-on-all-nodes"></a><strong>5 sqlconfigure\ Configuring SQL On All Nodes</strong></h4>
 <hr>
-<p>This is where the majority of the configuration happens. You will find all the things this powershell does at the top of the document. Open up an administrator PowerShell console and run the following.</p>
+<p>This is where the majority of the configuration happens. You will find all the things this powershell does at the top of the document. In your Bastions sessions to the SQLVM servers, Open up an administrator PowerShell console and run the following.</p>
 <pre class="hljs"><code><span class="hljs-comment"># If you modified the ARM template in any way, please adjust the appropriate commands below</span>
 <span class="hljs-comment"># latest sqlserver cmdlets</span>
 <span class="hljs-built_in">install-module</span> sqlserver <span class="hljs-literal">-AllowClobber</span> <span class="hljs-literal">-Force</span>
@@ -215,7 +215,7 @@ mkdir c:\adventureworks
 <span class="hljs-built_in">Install-WindowsFeature</span> <span class="hljs-literal">-Name</span> Failover<span class="hljs-literal">-Clustering</span> –IncludeManagementTools
 
 <span class="hljs-comment"># just in case local admin is still logged in</span>
-<span class="hljs-built_in">Restart-Computer</span> <span class="hljs-literal">-force</span></code></pre><p>Now you can administrate SQL Server using the domain login. Close the bastion Tabs and reconnect using <a href="mailto:&#97;&#x64;&#109;&#105;&#110;&#117;&#115;&#x65;&#114;&#x40;&#115;&#113;&#x6c;&#116;&#x72;&#x61;&#x69;&#x6e;&#x2e;&#x63;&#x6f;&#109;">&#97;&#x64;&#109;&#105;&#110;&#117;&#115;&#x65;&#114;&#x40;&#115;&#113;&#x6c;&#116;&#x72;&#x61;&#x69;&#x6e;&#x2e;&#x63;&#x6f;&#109;</a> with the same password.</p>
+<span class="hljs-built_in">Restart-Computer</span> <span class="hljs-literal">-force</span></code></pre><p>Now you can administrate SQL Server using the domain login. Close the bastion Tabs and reconnect using <a href="mailto:&#97;&#100;&#x6d;&#105;&#x6e;&#117;&#115;&#101;&#x72;&#x40;&#115;&#113;&#108;&#x74;&#114;&#x61;&#x69;&#x6e;&#46;&#x63;&#111;&#x6d;">&#97;&#100;&#x6d;&#105;&#x6e;&#117;&#115;&#101;&#x72;&#x40;&#115;&#113;&#108;&#x74;&#114;&#x61;&#x69;&#x6e;&#46;&#x63;&#111;&#x6d;</a> with the same password.</p>
 <p>That&#39;s it! Everything else is going to come down what it is you are training with. Classic mirroring, Log Shipping, Availability Groups, Failover Cluster Instances, replication...
 this will meet the needs of just about anything you could want. If you get fancy, you can deploy it twice and work with Distributed Availability Groups.</p>
 <p>This template was designed with speed of infrastructure deployment in mind. I have provided some basic scripts to accelerate domain configuration. Everything else is up to you!</p>
@@ -233,7 +233,7 @@ this will meet the needs of just about anything you could want. If you get fancy
 <p><a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fkcalmwinds%2FSQL-Training-Deployment%2Fmain%2Ftemplates%2Ftemplate.json"><img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure"></a></p>
 <h3 id="contributors"><a class="header-link" href="#contributors"></a><strong>Contributors</strong></h3>
 <hr>
-<p>Mark Cameron - MARKCAME - <a href="mailto:&#x4d;&#65;&#82;&#x4b;&#x43;&#x41;&#x4d;&#x45;&#x40;&#x6d;&#x69;&#99;&#x72;&#111;&#115;&#x6f;&#102;&#x74;&#x2e;&#x63;&#111;&#x6d;">&#x4d;&#65;&#82;&#x4b;&#x43;&#x41;&#x4d;&#x45;&#x40;&#x6d;&#x69;&#99;&#x72;&#111;&#115;&#x6f;&#102;&#x74;&#x2e;&#x63;&#111;&#x6d;</a></p>
+<p>Mark Cameron - MARKCAME - <a href="mailto:&#77;&#65;&#82;&#x4b;&#x43;&#65;&#77;&#x45;&#64;&#109;&#105;&#x63;&#x72;&#x6f;&#x73;&#x6f;&#102;&#x74;&#x2e;&#x63;&#111;&#109;">&#77;&#65;&#82;&#x4b;&#x43;&#65;&#77;&#x45;&#64;&#109;&#105;&#x63;&#x72;&#x6f;&#x73;&#x6f;&#102;&#x74;&#x2e;&#x63;&#111;&#109;</a></p>
 <hr>
 <h4 id="tools-used"><a class="header-link" href="#tools-used"></a><strong>Tools used</strong></h4>
 <hr>
