@@ -127,8 +127,6 @@ Once the deployment is complete, open a Bastion session to **SQLDCVM, SQL1VM, SQ
 
 ---
 
-In your Bastion session to **SQLDCVM**, create a text file then copy and paste the contents of ./create_dns_ad/DNSConfigTemplate.xml into the new text file and save it. Change the .txt extension to .xml. You may have use the view ribbon in File Explorer to enable showing extensions to properly change it.
-
 Open an administrative PowerShell console on **SQLDCVM** and run:
 
 ```powershell
