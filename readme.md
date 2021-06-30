@@ -199,10 +199,6 @@ Enable-NetFirewallRule -DisplayName "Windows Management Instrumentation (WMI-In)
 Enable-NetFirewallRule -DisplayName "Windows Management Instrumentation (DCOM-In)"
 
 
-# latest sqlserver cmdlets
-install-module sqlserver -AllowClobber -Force
-
-
 #after domain join, needs to be done under local adminuser acct -  run powershell as adminuser to do this or login as adminuser.
 Invoke-Sqlcmd -Database "master" -Query "CREATE LOGIN [SQLTRAIN\adminuser] FROM WINDOWS WITH DEFAULT_DATABASE=[master]" -ServerInstance "."
 Invoke-Sqlcmd -Database "master" -Query "ALTER SERVER ROLE [sysadmin] ADD MEMBER [SQLTRAIN\adminuser]" -ServerInstance "."
