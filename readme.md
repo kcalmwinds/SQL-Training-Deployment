@@ -206,7 +206,7 @@ Invoke-Sqlcmd -Database "master" -Query "CREATE LOGIN [SQLTRAIN\SQL3vm$] FROM WI
 Invoke-Sqlcmd -Database "master" -Query "ALTER SERVER ROLE [sysadmin] ADD MEMBER [SQLTRAIN\SQL2VM$]" -ServerInstance "."
 Invoke-Sqlcmd -Database "master" -Query "ALTER SERVER ROLE [sysadmin] ADD MEMBER [SQLTRAIN\SQL1vm$]" -ServerInstance "."
 Invoke-Sqlcmd -Database "master" -Query "ALTER SERVER ROLE [sysadmin] ADD MEMBER [SQLTRAIN\SQL3vm$]" -ServerInstance "."
-Invoke-Sqlcmd -Database "master" -Query "CREATE LOGIN [NT AUTHORITY\SYSTEM] FROM WINDOWS WITH DEFAULT_DATABASE=[master]" -ServerInstance "."
+Invoke-Sqlcmd -Database "master" -Query "IF NOT EXISTS (SELECT [name] FROM sys.server_principals WHERE name='NT AUTHORITY\SYSTEM') BEGIN CREATE LOGIN [NT AUTHORITY\SYSTEM] FROM WINDOWS WITH DEFAULT_DATABASE=[master]; END" -ServerInstance "."
 Invoke-Sqlcmd -Database "master" -Query "GRANT ALTER ANY AVAILABILITY GROUP TO [NT AUTHORITY\SYSTEM]" -ServerInstance "."
 Invoke-Sqlcmd -Database "master" -Query "GRANT CONNECT SQL TO [NT AUTHORITY\SYSTEM]" -ServerInstance "."
 Invoke-Sqlcmd -Database "master" -Query "GRANT VIEW SERVER STATE TO [NT AUTHORITY\SYSTEM]" -ServerInstance "."
